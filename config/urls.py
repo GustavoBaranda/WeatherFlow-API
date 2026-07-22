@@ -12,7 +12,7 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    # Redirección automática de la raíz a la documentación Swagger UI
+    # Automatic redirection from root to Swagger UI documentation
     path('', RedirectView.as_view(url='/api/schema/swagger-ui/', permanent=False)),
     
     path('admin/', admin.site.urls),

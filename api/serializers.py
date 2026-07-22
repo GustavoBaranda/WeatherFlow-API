@@ -1,3 +1,3 @@
 from rest_framework import serializers
 
-# Definir serializadores de la aplicación aquí
+# Define application serializers here

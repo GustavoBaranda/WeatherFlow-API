@@ -24,12 +24,12 @@ from rest_framework import serializers
 @permission_classes([AllowAny])
 def health_check(request):
     """
-    Verifica el estado del servicio API.
+    Verifies API service status.
     """
     return Response(
         {
             'status': 'ok',
-            'message': 'WeatherFlow API está funcionando correctamente.',
+            'message': 'WeatherFlow API is working correctly.',
             'version': '1.0.0'
         },
         status=status.HTTP_200_OK
