@@ -122,11 +122,19 @@ REST_FRAMEWORK = {
 # DRF Spectacular OpenAPI documentation settings
 SPECTACULAR_SETTINGS = {
     'TITLE': 'WeatherFlow API',
-    'DESCRIPTION': 'RESTful API service for WeatherFlow Application',
+    'DESCRIPTION': 'RESTful API service for WeatherFlow Application — Developed by Gustavo Baranda',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    
+    'CONTACT': {
+        'name': 'Gustavo Baranda',
+        'url': 'https://github.com/GustavoBaranda',
+        'email': 'baranda.gustavo@gmail.com',
+    },
+    'LICENSE': {
+        'name': 'MIT License',
+    },
 }
-
 # CORS Headers Configuration
 CORS_ALLOWED_ORIGINS = [
     origin.strip() for origin in os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',') if origin.strip()
