@@ -1,15 +1,15 @@
-from django.contrib.auth.models import User
-from rest_framework import status, serializers, viewsets
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample, inline_serializer, OpenApiResponse
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiExample,
+    inline_serializer,
+    OpenApiResponse,
+)
+from rest_framework import serializers
+from api.serializers import UserSerializer, UserCreateSerializer
 
-from .serializers import UserSerializer, UserCreateSerializer
-from .permissions import IsSelfOrAdmin
 
-
-@extend_schema(
+HEALTH_CHECK_SCHEMA = extend_schema(
     summary="Health Check Endpoint",
     description="Returns API status, application name, and system health information.",
     responses={
@@ -35,23 +35,9 @@ from .permissions import IsSelfOrAdmin
         )
     ]
 )
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def health_check(request):
-    """
-    Verifies API service status.
-    """
-    return Response(
-        {
-            'status': 'ok',
-            'message': 'WeatherFlow API is working correctly.',
-            'version': '1.0.0'
-        },
-        status=status.HTTP_200_OK
-    )
 
 
-@extend_schema_view(
+USER_VIEWSET_SCHEMA = extend_schema_view(
     list=extend_schema(
         summary="List all users",
         description="Retrieve a list of registered users. Requires admin authentication.",
@@ -273,19 +259,3 @@ def health_check(request):
         }
     )
 )
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API ViewSet for managing User accounts and their associated preferences.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    permission_classes = [IsSelfOrAdmin]
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return UserCreateSerializer
-        return UserSerializer
-
-    def get_permissions(self):
-        if self.action == 'create':
-            return [AllowAny()]
-        return [IsSelfOrAdmin()]
