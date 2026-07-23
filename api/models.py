@@ -23,12 +23,7 @@ class UserPreferences(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="preferences")
     temperature_unit = models.CharField(max_length=1, choices=UNIT_CHOICES, default='C')
     email_notifications = models.BooleanField(default=True)
-    summary_frequency = models.CharField(
-        max_length=10, 
-        choices=FREQUENCY_CHOICES, 
-        default='daily', 
-        help_text="Frequency of the periodic report (daily, weekly, or disabled)"
-    )
+    summary_frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES, default='daily', help_text="Frequency of the periodic report (daily, weekly, or disabled)")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -38,7 +33,6 @@ class UserPreferences(models.Model):
 
     def __str__(self):
         return f"Preferences for {self.user.username}"
-
 
 # Signals for automatic creation of User Preferences
 @receiver(post_save, sender=User)
