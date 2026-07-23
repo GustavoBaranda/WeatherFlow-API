@@ -1,0 +1,28 @@
+{% extends "drf_spectacular/swagger_ui.html" %}
+
+{% block extra_head %}
+<style>
+  .swagger-ui .topbar-wrapper a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  .swagger-ui .topbar-wrapper a img {
+    content: url('/static/logo.svg');
+    height: 42px;
+    max-width: 180px;
+    object-fit: contain;
+    margin-right: 12px;
+  }
+  .swagger-ui .topbar-wrapper a span {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .swagger-ui .topbar {
+    background-color: #0f172a !important;
+    border-bottom: 2px solid #1e293b;
+    padding: 10px 0;
+  }
+</style>
+{% endblock %}
