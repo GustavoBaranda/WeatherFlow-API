@@ -6,7 +6,7 @@ from rest_framework import status
 
 class UserViewsTest(APITestCase):
     """
-    Tests for UserViewSet CRUD endpoints (Registration, Retrieval, Update, Deletion).
+    Tests for UserViewSet CRUD endpoints and user preferences actions.
     """
 
     def setUp(self):
@@ -122,3 +122,20 @@ class UserViewsTest(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(User.objects.filter(pk=self.user.pk).exists())
+
+    def test_me_preferences_get(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse('api:user-me-preferences')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['temperature_unit'], 'C')
+        self.assertEqual(response.data['email_notifications'], True)
+
+    def test_me_preferences_patch(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse('api:user-me-preferences')
+        data = {'temperature_unit': 'F', 'summary_frequency': 'weekly'}
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['temperature_unit'], 'F')
+        self.assertEqual(response.data['summary_frequency'], 'weekly')

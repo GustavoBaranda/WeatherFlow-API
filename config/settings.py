@@ -131,11 +131,12 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_FAVICON_HREF': '/static/logo.svg',
     
-    'CONTACT': {
+'''    'CONTACT': {
         'name': 'Gustavo Baranda',
         'url': 'https://github.com/GustavoBaranda',
         'email': 'baranda.gustavo@gmail.com',
     },
+'''
     'LICENSE': {
         'name': 'MIT License',
     },
