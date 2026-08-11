@@ -4,9 +4,18 @@ from drf_spectacular.utils import (
     OpenApiExample,
     inline_serializer,
     OpenApiResponse,
+    OpenApiParameter,
 )
 from rest_framework import serializers
-from api.serializers import UserSerializer, UserCreateSerializer
+from api.serializers import (
+    UserSerializer,
+    UserCreateSerializer,
+    UserPreferencesSerializer,
+    CurrentWeatherSerializer,
+    WeatherForecastSerializer,
+    CitySearchResultSerializer,
+    NotificationSerializer,
+)
 
 
 HEALTH_CHECK_SCHEMA = extend_schema(
@@ -57,19 +66,19 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
                     'results': [
                         {
                             'id': 1,
-                            'username': 'johndoe',
-                            'email': 'johndoe@example.com',
-                            'first_name': 'John',
-                            'last_name': 'Doe',
+                            'username': 'gustavo_baranda',
+                            'email': 'gustavo@example.com',
+                            'first_name': 'Gustavo',
+                            'last_name': 'Baranda',
                             'is_active': True,
                             'is_staff': False,
-                            'date_joined': '2026-07-22T20:00:00Z',
+                            'date_joined': '2026-08-11T12:00:00Z',
                             'preferences': {
                                 'temperature_unit': 'C',
                                 'email_notifications': True,
                                 'summary_frequency': 'daily',
-                                'created_at': '2026-07-22T20:00:00Z',
-                                'updated_at': '2026-07-22T20:00:00Z'
+                                'created_at': '2026-08-11T12:00:00Z',
+                                'updated_at': '2026-08-11T12:00:00Z'
                             }
                         }
                     ]
@@ -93,19 +102,19 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
                 summary='Sample user profile and preferences',
                 value={
                     'id': 1,
-                    'username': 'johndoe',
-                    'email': 'johndoe@example.com',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
+                    'username': 'gustavo_baranda',
+                    'email': 'gustavo@example.com',
+                    'first_name': 'Gustavo',
+                    'last_name': 'Baranda',
                     'is_active': True,
                     'is_staff': False,
-                    'date_joined': '2026-07-22T20:00:00Z',
+                    'date_joined': '2026-08-11T12:00:00Z',
                     'preferences': {
                         'temperature_unit': 'C',
                         'email_notifications': True,
                         'summary_frequency': 'daily',
-                        'created_at': '2026-07-22T20:00:00Z',
-                        'updated_at': '2026-07-22T20:00:00Z'
+                        'created_at': '2026-08-11T12:00:00Z',
+                        'updated_at': '2026-08-11T12:00:00Z'
                     }
                 },
                 response_only=True
@@ -125,11 +134,11 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
                 summary='Example request payload to register a new user',
                 description='Valid sample data including password with uppercase, lowercase, and numbers.',
                 value={
-                    'username': 'johndoe',
-                    'email': 'johndoe@example.com',
-                    'password': 'SecurePassword123',
-                    'first_name': 'John',
-                    'last_name': 'Doe'
+                    'username': 'gustavo_baranda',
+                    'email': 'gustavo@example.com',
+                    'password': 'PasswordSegura123!',
+                    'first_name': 'Gustavo',
+                    'last_name': 'Baranda'
                 },
                 request_only=True
             ),
@@ -138,10 +147,10 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
                 summary='Successful user creation response',
                 value={
                     'id': 1,
-                    'username': 'johndoe',
-                    'email': 'johndoe@example.com',
-                    'first_name': 'John',
-                    'last_name': 'Doe'
+                    'username': 'gustavo_baranda',
+                    'email': 'gustavo@example.com',
+                    'first_name': 'Gustavo',
+                    'last_name': 'Baranda'
                 },
                 response_only=True,
                 status_codes=['201']
@@ -163,9 +172,9 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
                 'User Profile Update Payload',
                 summary='Example update payload',
                 value={
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'password': 'NewSecurePassword456',
+                    'first_name': 'Gustavo',
+                    'last_name': 'Baranda',
+                    'password': 'NewSecurePassword456!',
                     'preferences': {
                         'temperature_unit': 'F',
                         'summary_frequency': 'weekly'
@@ -178,19 +187,19 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
                 summary='Example response after updating user profile',
                 value={
                     'id': 1,
-                    'username': 'johndoe',
-                    'email': 'johndoe@example.com',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
+                    'username': 'gustavo_baranda',
+                    'email': 'gustavo@example.com',
+                    'first_name': 'Gustavo',
+                    'last_name': 'Baranda',
                     'is_active': True,
                     'is_staff': False,
-                    'date_joined': '2026-07-22T20:00:00Z',
+                    'date_joined': '2026-08-11T12:00:00Z',
                     'preferences': {
                         'temperature_unit': 'F',
                         'email_notifications': True,
                         'summary_frequency': 'weekly',
-                        'created_at': '2026-07-22T20:00:00Z',
-                        'updated_at': '2026-07-22T20:05:00Z'
+                        'created_at': '2026-08-11T12:00:00Z',
+                        'updated_at': '2026-08-11T12:35:00Z'
                     }
                 },
                 response_only=True,
@@ -213,8 +222,8 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
                 'User Profile Partial Update Payload',
                 summary='Example partial update payload',
                 value={
-                    'first_name': 'John',
-                    'last_name': 'Doe',
+                    'first_name': 'Gustavo',
+                    'last_name': 'Baranda',
                     'preferences': {
                         'temperature_unit': 'F',
                         'email_notifications': True,
@@ -222,29 +231,6 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
                     }
                 },
                 request_only=True
-            ),
-            OpenApiExample(
-                'User Profile Partial Update Response',
-                summary='Example response after partial update',
-                value={
-                    'id': 1,
-                    'username': 'johndoe',
-                    'email': 'johndoe@example.com',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'is_active': True,
-                    'is_staff': False,
-                    'date_joined': '2026-07-22T20:00:00Z',
-                    'preferences': {
-                        'temperature_unit': 'F',
-                        'email_notifications': True,
-                        'summary_frequency': 'daily',
-                        'created_at': '2026-07-22T20:00:00Z',
-                        'updated_at': '2026-07-22T20:05:00Z'
-                    }
-                },
-                response_only=True,
-                status_codes=['200']
             )
         ]
     ),
@@ -257,5 +243,42 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
             403: OpenApiResponse(description="You do not have permission to delete this user account."),
             404: OpenApiResponse(description="User not found.")
         }
+    )
+)
+
+
+NOTIFICATION_VIEWSET_SCHEMA = extend_schema_view(
+    list=extend_schema(
+        summary="List user notifications",
+        description="Retrieve all in-app notifications for the authenticated user.",
+        responses={200: NotificationSerializer(many=True)}
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve notification detail",
+        description="Get specific notification by ID.",
+        responses={200: NotificationSerializer}
+    ),
+    unread_count=extend_schema(
+        summary="Get unread notification count",
+        description="Returns count of unread notifications for bell icon.",
+        responses={200: inline_serializer(name='UnreadCountResponse', fields={'unread_count': serializers.IntegerField()})}
+    ),
+    mark_read=extend_schema(
+        summary="Mark notification as read",
+        description="Mark a single notification as read.",
+        responses={200: NotificationSerializer}
+    ),
+    mark_all_read=extend_schema(
+        summary="Mark all notifications as read",
+        description="Mark all notifications of current user as read.",
+        responses={200: inline_serializer(name='MarkAllReadResponse', fields={'message': serializers.CharField(), 'updated_count': serializers.IntegerField()})}
+    ),
+    generate_summary=extend_schema(
+        summary="Generate weather summary notification",
+        description="Generates an in-app weather report notification based on user preferred city & temperature unit.",
+        parameters=[
+            OpenApiParameter(name='city', description='Optional city override', required=False, type=str),
+        ],
+        responses={201: NotificationSerializer}
     )
 )

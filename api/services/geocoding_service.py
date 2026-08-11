@@ -10,6 +10,7 @@ DEFAULT_CITIES: Dict[str, Tuple[float, float, str]] = {
     'tokyo': (35.6762, 139.6503, 'Tokyo, Japan'),
     'santiago': (-33.4489, -70.6693, 'Santiago, Chile'),
     'mexico city': (19.4326, -99.1332, 'Mexico City, Mexico'),
+    'wilde': (-34.7000, -58.3167, 'Wilde, Argentina'),
 }
 
 GEOCODING_CACHE_TIMEOUT = 86400  # 24 hours

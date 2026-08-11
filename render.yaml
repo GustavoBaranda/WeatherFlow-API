@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: weatherflow-api
+    env: python
+    buildCommand: "./venv/bin/pip install -r requirements.txt || pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: weatherflow-db
+          property: connectionString
+
+databases:
+  - name: weatherflow-db
+    databaseName: weatherflow_db
+    user: weatherflow_user
+    plan: free

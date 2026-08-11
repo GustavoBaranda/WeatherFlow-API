@@ -14,6 +14,7 @@ class CurrentWeatherSerializer(serializers.Serializer):
     weather_code = serializers.IntegerField(help_text="WMO weather interpretation code")
     coordinates = CoordinatesSerializer()
     source = serializers.CharField(help_text="Data source provider")
+    cached = serializers.BooleanField(default=False, help_text="True if served from memory cache")
 
 
 class ForecastDaySerializer(serializers.Serializer):
@@ -28,6 +29,7 @@ class WeatherForecastSerializer(serializers.Serializer):
     unit = serializers.ChoiceField(choices=['C', 'F'])
     forecast = ForecastDaySerializer(many=True)
     source = serializers.CharField(help_text="Data source provider")
+    cached = serializers.BooleanField(default=False, help_text="True if served from memory cache")
 
 
 class CitySearchResultSerializer(serializers.Serializer):
