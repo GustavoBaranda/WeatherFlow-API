@@ -28,3 +28,13 @@ class WeatherForecastSerializer(serializers.Serializer):
     unit = serializers.ChoiceField(choices=['C', 'F'])
     forecast = ForecastDaySerializer(many=True)
     source = serializers.CharField(help_text="Data source provider")
+
+
+class CitySearchResultSerializer(serializers.Serializer):
+    name = serializers.CharField(help_text="City name")
+    country = serializers.CharField(help_text="Country name")
+    country_code = serializers.CharField(help_text="Two-letter country code")
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    timezone = serializers.CharField()
+    display_name = serializers.CharField(help_text="Formatted display name (City, Country)")

@@ -1,32 +1,14 @@
 import requests
-from typing import Dict, Any, Tuple
-
-DEFAULT_CITIES: Dict[str, Tuple[float, float]] = {
-    'buenos aires': (-34.6037, -58.3816),
-    'madrid': (40.4168, -3.7038),
-    'new york': (40.7128, -74.0060),
-    'london': (51.5074, -0.1278),
-    'tokyo': (35.6762, 139.6503),
-    'santiago': (-33.4489, -70.6693),
-    'mexico city': (19.4326, -99.1332),
-}
+from typing import Dict, Any
+from .geocoding_service import resolve_city_coordinates
 
 
 def celsius_to_fahrenheit(celsius: float) -> float:
     return round((celsius * 9 / 5) + 32, 1)
 
 
-def get_city_coordinates(city_name: str) -> Tuple[float, float, str]:
-    normalized = city_name.strip().lower()
-    if normalized in DEFAULT_CITIES:
-        lat, lon = DEFAULT_CITIES[normalized]
-        return lat, lon, city_name.title()
-    # Default to Buenos Aires if city is unknown
-    return DEFAULT_CITIES['buenos aires'][0], DEFAULT_CITIES['buenos aires'][1], city_name.title()
-
-
 def get_current_weather(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dict[str, Any]:
-    lat, lon, city_display = get_city_coordinates(city)
+    lat, lon, city_display = resolve_city_coordinates(city)
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
 
     try:
@@ -66,7 +48,7 @@ def get_current_weather(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dic
 
 
 def get_weather_forecast(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dict[str, Any]:
-    lat, lon, city_display = get_city_coordinates(city)
+    lat, lon, city_display = resolve_city_coordinates(city)
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min&timezone=auto"
 
     try:

@@ -6,6 +6,7 @@ from .users import (
 from .weather import (
     CurrentWeatherSerializer,
     WeatherForecastSerializer,
+    CitySearchResultSerializer,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     'UserCreateSerializer',
     'CurrentWeatherSerializer',
     'WeatherForecastSerializer',
+    'CitySearchResultSerializer',
 ]

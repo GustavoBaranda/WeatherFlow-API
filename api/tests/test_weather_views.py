@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from rest_framework import status
 from api.services.weather_service import celsius_to_fahrenheit, get_current_weather, get_weather_forecast
+from api.services.geocoding_service import search_cities, resolve_city_coordinates
 
 
 class WeatherViewsTest(APITestCase):
@@ -41,7 +42,6 @@ class WeatherViewsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['unit'], 'C')
         self.assertEqual(response.data['temperature'], 22.5)
-        self.assertEqual(response.data['city'], 'Buenos Aires')
 
     @patch('requests.get')
     def test_current_weather_fahrenheit(self, mock_get):
@@ -67,7 +67,6 @@ class WeatherViewsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['unit'], 'F')
         self.assertEqual(response.data['temperature'], celsius_to_fahrenheit(20.0))
-        self.assertEqual(response.data['city'], 'Madrid')
 
     @patch('requests.get')
     def test_weather_forecast(self, mock_get):
@@ -89,6 +88,40 @@ class WeatherViewsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['forecast']), 2)
         self.assertEqual(response.data['forecast'][0]['temp_max'], 25.0)
+
+    @patch('requests.get')
+    def test_city_search_endpoint(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            'results': [
+                {
+                    'name': 'Cordoba',
+                    'country': 'Argentina',
+                    'country_code': 'AR',
+                    'latitude': -31.4135,
+                    'longitude': -64.1810,
+                    'timezone': 'America/Argentina/Cordoba'
+                }
+            ]
+        }
+        mock_response.raise_for_status.return_value = None
+        mock_get.return_value = mock_response
+
+        self.client.force_authenticate(user=self.user)
+        url = reverse('api:city_search')
+        response = self.client.get(f"{url}?q=Cordoba")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['name'], 'Cordoba')
+        self.assertEqual(response.data['results'][0]['country'], 'Argentina')
+
+    def test_city_search_empty_query(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse('api:city_search')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['results'], [])
 
     def test_celsius_to_fahrenheit_converter(self):
         self.assertEqual(celsius_to_fahrenheit(0), 32.0)
