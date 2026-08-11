@@ -27,9 +27,26 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'create':
             return [AllowAny()]
-        if self.action == 'me_preferences':
+        if self.action in ['me', 'me_preferences']:
             return [IsAuthenticated()]
         return [IsSelfOrAdmin()]
+
+    @action(detail=False, methods=['get', 'patch'], url_path='me', permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """
+        Get or partially update details for the currently authenticated user.
+        """
+        user = request.user
+
+        if request.method == 'GET':
+            serializer = UserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        elif request.method == 'PATCH':
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get', 'patch'], url_path='me/preferences', permission_classes=[IsAuthenticated])
     def me_preferences(self, request):
@@ -47,4 +64,5 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
 

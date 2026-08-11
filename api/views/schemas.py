@@ -243,8 +243,17 @@ USER_VIEWSET_SCHEMA = extend_schema_view(
             403: OpenApiResponse(description="You do not have permission to delete this user account."),
             404: OpenApiResponse(description="User not found.")
         }
+    ),
+    me=extend_schema(
+        summary="Get or update current authenticated user profile",
+        description="Retrieve or partially update details for the currently logged-in user.",
+        responses={
+            200: UserSerializer,
+            401: OpenApiResponse(description="Authentication credentials were not provided.")
+        }
     )
 )
+
 
 
 NOTIFICATION_VIEWSET_SCHEMA = extend_schema_view(
