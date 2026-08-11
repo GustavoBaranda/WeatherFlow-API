@@ -1,6 +1,10 @@
 import requests
 from typing import Dict, Any
+from django.core.cache import cache
 from .geocoding_service import resolve_city_coordinates
+
+CURRENT_WEATHER_CACHE_TIMEOUT = 900  # 15 minutes
+FORECAST_CACHE_TIMEOUT = 1800  # 30 minutes
 
 
 def celsius_to_fahrenheit(celsius: float) -> float:
@@ -8,6 +12,13 @@ def celsius_to_fahrenheit(celsius: float) -> float:
 
 
 def get_current_weather(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dict[str, Any]:
+    city_key = city.strip().lower()
+    cache_key = f"weather_current_{city_key}_{temp_unit}"
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        cached_data['cached'] = True
+        return cached_data
+
     lat, lon, city_display = resolve_city_coordinates(city)
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
 
@@ -23,7 +34,7 @@ def get_current_weather(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dic
 
         temp_final = temp_c if temp_unit == 'C' else celsius_to_fahrenheit(temp_c)
 
-        return {
+        result = {
             'city': city_display,
             'temperature': temp_final,
             'unit': temp_unit,
@@ -31,9 +42,11 @@ def get_current_weather(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dic
             'weather_code': weather_code,
             'coordinates': {'latitude': lat, 'longitude': lon},
             'source': 'Open-Meteo API',
+            'cached': False,
         }
+        cache.set(cache_key, result, CURRENT_WEATHER_CACHE_TIMEOUT)
+        return result
     except Exception as e:
-        # Fallback response in case external API is unreachable
         temp_c = 20.0
         return {
             'city': city_display,
@@ -43,11 +56,19 @@ def get_current_weather(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dic
             'weather_code': 0,
             'coordinates': {'latitude': lat, 'longitude': lon},
             'source': 'Fallback Mock (Network Error)',
+            'cached': False,
             'error': str(e)
         }
 
 
 def get_weather_forecast(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dict[str, Any]:
+    city_key = city.strip().lower()
+    cache_key = f"weather_forecast_{city_key}_{temp_unit}"
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        cached_data['cached'] = True
+        return cached_data
+
     lat, lon, city_display = resolve_city_coordinates(city)
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min&timezone=auto"
 
@@ -72,17 +93,21 @@ def get_weather_forecast(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Di
                 'unit': temp_unit
             })
 
-        return {
+        result = {
             'city': city_display,
             'unit': temp_unit,
             'forecast': forecast_list,
             'source': 'Open-Meteo API',
+            'cached': False,
         }
+        cache.set(cache_key, result, FORECAST_CACHE_TIMEOUT)
+        return result
     except Exception as e:
         return {
             'city': city_display,
             'unit': temp_unit,
             'forecast': [],
             'source': 'Fallback Mock (Network Error)',
+            'cached': False,
             'error': str(e)
         }

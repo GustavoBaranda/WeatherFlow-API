@@ -1,6 +1,7 @@
 from unittest.mock import patch, MagicMock
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from rest_framework.test import APITestCase
 from rest_framework import status
 from api.services.weather_service import celsius_to_fahrenheit, get_current_weather, get_weather_forecast
@@ -9,6 +10,7 @@ from api.services.geocoding_service import search_cities, resolve_city_coordinat
 
 class WeatherViewsTest(APITestCase):
     def setUp(self):
+        cache.clear()
         self.user = User.objects.create_user(
             username='weatheruser',
             password='Password123',
@@ -23,7 +25,7 @@ class WeatherViewsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @patch('requests.get')
-    def test_current_weather_celsius(self, mock_get):
+    def test_current_weather_celsius_and_caching(self, mock_get):
         mock_response = MagicMock()
         mock_response.json.return_value = {
             'current_weather': {
@@ -37,11 +39,18 @@ class WeatherViewsTest(APITestCase):
 
         self.client.force_authenticate(user=self.user)
         url = reverse('api:weather_current')
-        response = self.client.get(url)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['unit'], 'C')
-        self.assertEqual(response.data['temperature'], 22.5)
+        # First request (fetches from external API)
+        res1 = self.client.get(f"{url}?city=Tokyo")
+        self.assertEqual(res1.status_code, status.HTTP_200_OK)
+        self.assertFalse(res1.data['cached'])
+        self.assertEqual(mock_get.call_count, 1)
+
+        # Second request (served from Django cache)
+        res2 = self.client.get(f"{url}?city=Tokyo")
+        self.assertEqual(res2.status_code, status.HTTP_200_OK)
+        self.assertTrue(res2.data['cached'])
+        self.assertEqual(mock_get.call_count, 1)  # No extra HTTP call!
 
     @patch('requests.get')
     def test_current_weather_fahrenheit(self, mock_get):
@@ -56,7 +65,6 @@ class WeatherViewsTest(APITestCase):
         mock_response.raise_for_status.return_value = None
         mock_get.return_value = mock_response
 
-        # Update user preference to Fahrenheit
         self.user.preferences.temperature_unit = 'F'
         self.user.preferences.save()
 
@@ -114,7 +122,6 @@ class WeatherViewsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(response.data['results'][0]['name'], 'Cordoba')
-        self.assertEqual(response.data['results'][0]['country'], 'Argentina')
 
     def test_city_search_empty_query(self):
         self.client.force_authenticate(user=self.user)

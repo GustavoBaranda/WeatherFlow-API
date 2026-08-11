@@ -1,5 +1,6 @@
 import requests
 from typing import List, Dict, Any, Tuple
+from django.core.cache import cache
 
 DEFAULT_CITIES: Dict[str, Tuple[float, float, str]] = {
     'buenos aires': (-34.6037, -58.3816, 'Buenos Aires, Argentina'),
@@ -11,13 +12,21 @@ DEFAULT_CITIES: Dict[str, Tuple[float, float, str]] = {
     'mexico city': (19.4326, -99.1332, 'Mexico City, Mexico'),
 }
 
+GEOCODING_CACHE_TIMEOUT = 86400  # 24 hours
+
 
 def search_cities(query: str, count: int = 5) -> List[Dict[str, Any]]:
     """
-    Searches for cities matching query using Open-Meteo Geocoding API.
+    Searches for cities matching query using Open-Meteo Geocoding API with caching.
     """
     if not query or len(query.strip()) < 2:
         return []
+
+    query_key = query.strip().lower()
+    cache_key = f"geocoding_search_{query_key}_{count}"
+    cached_result = cache.get(cache_key)
+    if cached_result is not None:
+        return cached_result
 
     url = f"https://geocoding-api.open-meteo.com/v1/search?name={query.strip()}&count={count}&language=en&format=json"
 
@@ -38,9 +47,9 @@ def search_cities(query: str, count: int = 5) -> List[Dict[str, Any]]:
                 'timezone': item.get('timezone', 'UTC'),
                 'display_name': f"{item.get('name', '')}, {item.get('country', '')}".strip(', ')
             })
+        cache.set(cache_key, city_list, GEOCODING_CACHE_TIMEOUT)
         return city_list
     except Exception:
-        # Fallback to local filtering from DEFAULT_CITIES if external search fails
         q = query.strip().lower()
         matched = []
         for key, (lat, lon, display) in DEFAULT_CITIES.items():
@@ -67,11 +76,9 @@ def resolve_city_coordinates(city_name: str) -> Tuple[float, float, str]:
         lat, lon, display = DEFAULT_CITIES[normalized]
         return lat, lon, display
 
-    # Try dynamic search
     search_results = search_cities(city_name, count=1)
     if search_results:
         top = search_results[0]
         return top['latitude'], top['longitude'], top['display_name']
 
-    # Default fallback
     return DEFAULT_CITIES['buenos aires'][0], DEFAULT_CITIES['buenos aires'][1], city_name.title()
