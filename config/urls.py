@@ -11,12 +11,22 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+# pyrefly: ignore [missing-import]
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 urlpatterns = [
     # Automatic redirection from root to Swagger UI documentation
     path('', RedirectView.as_view(url='/api/schema/swagger-ui/', permanent=False)),
     
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    
+    # JWT Authentication Endpoints
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     # OpenAPI 3 Schema & UI documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -29,7 +29,7 @@ class PermissionsTest(APITestCase):
     def test_user_list_unauthenticated(self):
         url = reverse('api:user-list')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_list_as_regular_user(self):
         self.client.force_authenticate(user=self.user1)

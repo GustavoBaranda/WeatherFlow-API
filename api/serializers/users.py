@@ -41,10 +41,11 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         if preferences_data and hasattr(instance, 'preferences'):
-            preferences = instance.preferences
-            for attr, value in preferences_data.items():
-                setattr(preferences, attr, value)
-            preferences.save()
+            pref_serializer = UserPreferencesSerializer(
+                instance.preferences, data=preferences_data, partial=True
+            )
+            pref_serializer.is_valid(raise_exception=True)
+            pref_serializer.save()
 
         return instance
 

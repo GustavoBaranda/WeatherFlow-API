@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     
     # Third party packages
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
     'drf_spectacular',
     
@@ -116,11 +117,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Django REST Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 # DRF Spectacular OpenAPI documentation settings
@@ -130,13 +144,11 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_FAVICON_HREF': '/static/logo.svg',
-    
-'''    'CONTACT': {
-        'name': 'Gustavo Baranda',
-        'url': 'https://github.com/GustavoBaranda',
-        'email': 'baranda.gustavo@gmail.com',
-    },
-'''
+    # 'CONTACT': {
+    #     'name': 'Gustavo Baranda',
+    #     'url': 'https://github.com/GustavoBaranda',
+    #     'email': 'baranda.gustavo@gmail.com',
+    # },
     'LICENSE': {
         'name': 'MIT License',
     },
