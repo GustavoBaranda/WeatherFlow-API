@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     health_check,
     UserViewSet,
+    NotificationViewSet,
     current_weather_view,
     weather_forecast_view,
     city_search_view,
@@ -12,6 +13,7 @@ app_name = 'api'
 
 router = DefaultRouter()
 router.register('users', UserViewSet, basename='user')
+router.register('notifications', NotificationViewSet, basename='notification')
 
 urlpatterns = [
     path('health/', health_check, name='health_check'),

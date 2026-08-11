@@ -45,5 +45,32 @@ def create_user_preferences(sender, instance, created, **kwargs):
         UserPreferences.objects.create(user=instance)
 
 
+class Notification(models.Model):
+    """
+    In-App notifications for weather alerts, summaries, and system updates.
+    """
+    TYPE_CHOICES = [
+        ('weather_summary', 'Weather Summary'),
+        ('weather_alert', 'Weather Alert'),
+        ('system', 'System Notification'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    notification_type = models.CharField(max_length=50, choices=TYPE_CHOICES, default='weather_summary')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.notification_type}] {self.title} for {self.user.username}"
+
+
+
 
 

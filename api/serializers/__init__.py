@@ -8,6 +8,7 @@ from .weather import (
     WeatherForecastSerializer,
     CitySearchResultSerializer,
 )
+from .notifications import NotificationSerializer
 
 __all__ = [
     'UserPreferencesSerializer',
@@ -16,4 +17,5 @@ __all__ = [
     'CurrentWeatherSerializer',
     'WeatherForecastSerializer',
     'CitySearchResultSerializer',
+    'NotificationSerializer',
 ]
