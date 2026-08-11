@@ -12,7 +12,7 @@ def celsius_to_fahrenheit(celsius: float) -> float:
 
 
 def get_current_weather(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dict[str, Any]:
-    city_key = city.strip().lower()
+    city_key = ''.join(c if c.isalnum() else '_' for c in city.strip().lower())
     cache_key = f"weather_current_{city_key}_{temp_unit}"
     cached_data = cache.get(cache_key)
     if cached_data:
@@ -62,7 +62,7 @@ def get_current_weather(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dic
 
 
 def get_weather_forecast(city: str = 'Buenos Aires', temp_unit: str = 'C') -> Dict[str, Any]:
-    city_key = city.strip().lower()
+    city_key = ''.join(c if c.isalnum() else '_' for c in city.strip().lower())
     cache_key = f"weather_forecast_{city_key}_{temp_unit}"
     cached_data = cache.get(cache_key)
     if cached_data:

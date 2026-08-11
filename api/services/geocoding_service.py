@@ -22,7 +22,7 @@ def search_cities(query: str, count: int = 5) -> List[Dict[str, Any]]:
     if not query or len(query.strip()) < 2:
         return []
 
-    query_key = query.strip().lower()
+    query_key = ''.join(c if c.isalnum() else '_' for c in query.strip().lower())
     cache_key = f"geocoding_search_{query_key}_{count}"
     cached_result = cache.get(cache_key)
     if cached_result is not None:
