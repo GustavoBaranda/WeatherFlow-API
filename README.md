@@ -1,16 +1,20 @@
 # WeatherFlow API 🌤️
 
 <p align="center">
-  <img src="https://img.shields.io/badge/PYTHON-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/PYTHON-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/DJANGO-5.0%2B-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
   <img src="https://img.shields.io/badge/DRF-3.15%2B-A30000?style=for-the-badge&logo=django&logoColor=white" alt="DRF">
   <img src="https://img.shields.io/badge/JWT_AUTH-JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT">
   <img src="https://img.shields.io/badge/OPENAPI_3-SWAGGER-85EA2D?style=for-the-badge&logo=openapi-initiative&logoColor=black" alt="OpenAPI">
+  <img src="https://img.shields.io/badge/RENDER-LIVE_DEPLOY-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render">
   <img src="https://img.shields.io/badge/DOCKER-READY-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
   <img src="https://img.shields.io/badge/LICENSE-MIT-green.svg?style=for-the-badge" alt="License">
 </p>
 
 > **WeatherFlow API** es una solución backend RESTful enterprise desarrollada en Python 3 y Django REST Framework para la gestión de usuarios, agregación meteorológica en tiempo real con geocodificación global, notificaciones in-app y seguridad stateless mediante JWT.
+> 
+> 🌐 **URL de Producción (Render Cloud):** [https://weatherflow-api.onrender.com](https://weatherflow-api.onrender.com)  
+> 📖 **Documentación Swagger UI:** [https://weatherflow-api.onrender.com/api/schema/swagger-ui/](https://weatherflow-api.onrender.com/api/schema/swagger-ui/)
 
 ---
 
@@ -20,13 +24,14 @@
 
 ### 💡 Arquitectura y Decisiones Clave:
 - **Autenticación Stateless JWT:** Emisión y renovación de pares de tokens (*Access & Refresh Tokens*) mediante `djangorestframework-simplejwt`.
-- **Integración Meteorológica & Geocodificación Dinámica:** Conexión con las APIs de *Open-Meteo* para búsqueda de cualquier ciudad del mundo y cálculo de pronósticos de 7 días.
+- **Perfil de Usuario Autenticado (`/api/users/me/`):** Endpoint dedicado para que cualquier usuario acceda y actualice su perfil e información personal sin requerir permisos administrativos.
+- **Integración Meteorológica & Geocodificación Dinámica:** Conexión con las APIs de *Open-Meteo* para búsqueda de cualquier ciudad del mundo y cálculo de pronósticos detallados.
 - **Conversión Automática de Unidades:** Lógica de negocio orientada a las preferencias del usuario (`Celsius` / `Fahrenheit`).
 - **Módulo de Notificaciones In-App:** Sistema nativo para generación de alertas y resúmenes climáticos con contador de no leídas (`🔔`).
 - **Caché en Memoria y Rate Limiting:** Optimización de tiempos de respuesta a **~2ms** por *cache hit* (`django.core.cache`) y protección con limitación de tasa (*Throttling*) en DRF.
 - **Documentación Interactiva OpenAPI 3:** Integración completa de esquemas tipados con `drf-spectacular` en Swagger UI y ReDoc.
-- **CORS Habilitado para Integración Frontend:** Configuración flexible (`CORS_ALLOW_ALL_ORIGINS=True`) para permitir consumo inmediato desde cualquier cliente web (React, Next.js, Vue, Svelte) o aplicaciones móviles sin errores de origen cruzado.
-- **Preparado para Producción:** Soporte híbrido para base de datos (SQLite / PostgreSQL con `dj-database-url`), servidores de estáticos optimizados (`WhiteNoise`), WSGI de alto rendimiento (`Gunicorn`), contenedorización (`Dockerfile`, `docker-compose.yml`), manifiesto Cloud (`render.yaml`) y CI/CD en GitHub Actions (`.github/workflows/django_ci.yml`).
+- **CORS Habilitado para Integración Frontend:** Configuración flexible (`CORS_ALLOW_ALL_ORIGINS=True`) para permitir consumo inmediato desde aplicaciones móviles Expo / React Native o clientes Web (React, Next.js).
+- **Infraestructura y Despliegue en la Nube:** Manifiesto de infraestructura como código `render.yaml` (Plan Gratuito), distribución de estáticos con `WhiteNoise`, servidor WSGI `Gunicorn`, base de datos PostgreSQL en producción y pipeline de CI/CD automatizado en GitHub Actions (`.github/workflows/django_ci.yml`).
 
 ---
 
@@ -52,7 +57,7 @@ WeatherFlow APP/
 │   │   └── notifications.py
 │   ├── views/                 # Vistas modularizadas
 │   │   ├── health.py          # Endpoint de Health Check
-│   │   ├── users.py           # UserViewSet y Preferencias
+│   │   ├── users.py           # UserViewSet, Me Endpoint y Preferencias
 │   │   ├── weather.py         # Clima actual, pronósticos y búsqueda
 │   │   └── notifications.py   # ViewSet de Notificaciones In-App
 │   └── tests/                 # Suite de 39 pruebas automatizadas
@@ -82,7 +87,7 @@ WeatherFlow APP/
 
 | Categoría | Tecnología | Uso en el Proyecto |
 | :--- | :--- | :--- |
-| **Lenguaje** | [Python 3.10+](https://www.python.org/) | Lenguaje base de desarrollo |
+| **Lenguaje** | [Python 3.13](https://www.python.org/) | Lenguaje base de desarrollo |
 | **Framework Web** | [Django 5.0+](https://www.djangoproject.com/) | Framework MVC backend |
 | **API REST** | [Django REST Framework](https://www.django-rest-framework.org/) | Construcción de APIs y ViewSets |
 | **Autenticación** | [SimpleJWT](https://django-rest-framework-simplejwt.readthedocs.io/) | Tokens JWT (*Access / Refresh*) |
@@ -90,6 +95,7 @@ WeatherFlow APP/
 | **Base de Datos** | SQLite (Dev) / PostgreSQL (Prod) | Almacenamiento persistente con `dj-database-url` |
 | **Caché & Throttling** | `django.core.cache` + DRF Throttling | In-memory caching & Rate Limiting |
 | **Estáticos & Server** | WhiteNoise + Gunicorn | Servidor WSGI y distribución de estáticos |
+| **Despliegue Cloud** | [Render Cloud](https://render.com/) | Hospedaje y base de datos gestionada |
 | **Testing** | [pytest-django](https://pytest-django.readthedocs.io/) | Suite de 39 pruebas automatizadas |
 | **Contenedores & CI** | Docker + GitHub Actions | Contenedorización e Integración Continua |
 
@@ -135,7 +141,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ### 5. Ejecutar Migraciones e Iniciar el Servidor
 ```bash
 python manage.py migrate
-python manage.py runserver
+python manage.py runserver 8001
 ```
 
 ---
@@ -152,9 +158,9 @@ docker compose up --build
 
 ## 📌 Documentación de la API (OpenAPI 3)
 
-Una vez iniciado el servidor (`http://127.0.0.1:8000/`), accede a la documentación interactiva:
+Accede a la documentación interactiva desplegada en producción o localmente:
 
-- **Swagger UI (Redirección por defecto):** [http://127.0.0.1:8000/](http://127.0.0.1:8000/) o `/api/schema/swagger-ui/`
+- **Swagger UI (Redirección por defecto):** [https://weatherflow-api.onrender.com/](https://weatherflow-api.onrender.com/) o `/api/schema/swagger-ui/`
 - **ReDoc:** `/api/schema/redoc/`
 - **Esquema OpenAPI JSON/YAML:** `/api/schema/`
 
@@ -167,6 +173,7 @@ Una vez iniciado el servidor (`http://127.0.0.1:8000/`), accede a la documentaci
 | `POST` | `/api/token/refresh/` | Renovar token de acceso JWT | Pública |
 | `POST` | `/api/users/` | Registrar nuevo usuario | Pública |
 | `GET` | `/api/users/` | Listar usuarios (Solo administradores) | `Bearer JWT` |
+| `GET / PATCH` | `/api/users/me/` | Obtener o actualizar perfil del usuario autenticado | `Bearer JWT` |
 | `GET / PATCH` | `/api/users/me/preferences/` | Obtener o actualizar preferencias de perfil | `Bearer JWT` |
 | `GET` | `/api/weather/cities/search/?q=` | Búsqueda dinámica de ciudades del mundo | `Bearer JWT` |
 | `GET` | `/api/weather/current/?city=` | Clima actual adaptado a unidad del usuario | `Bearer JWT` |
@@ -189,7 +196,7 @@ Para correr la suite de pruebas con `pytest`:
 pytest
 ```
 
-> 🟢 **GitHub Actions CI:** Cada `git push` o *Pull Request* desencadena automáticamente la ejecución del pipeline en `.github/workflows/django_ci.yml` en entornos aisados con Python 3.13.
+> 🟢 **GitHub Actions CI:** Cada `git push` o *Pull Request* desencadena automáticamente la ejecución del pipeline en `.github/workflows/django_ci.yml` en entornos aislados con Python 3.13.
 
 ---
 
