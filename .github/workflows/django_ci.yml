@@ -31,4 +31,4 @@ jobs:
         SECRET_KEY: "django-insecure-ci-test-key-12345"
         DEBUG: "True"
       run: |
-        pytest
+        python -m pytest
