@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-for-developme
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = [
-    host.strip() for host in os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,*.onrender.com').split(',') if host.strip()
+    host.strip() for host in os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,.onrender.com,*').split(',') if host.strip()
 ]
 
 # Application definition
